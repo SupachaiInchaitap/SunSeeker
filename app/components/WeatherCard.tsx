@@ -5,7 +5,17 @@ const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
 const CITY = "Bangkok";
 
 export default function WeatherCard() {
-  const [weather, setWeather] = useState<any>(null);
+  interface WeatherData {
+    name: string;
+    main: {
+      temp: number;
+    };
+    weather: {
+      description: string;
+    }[];
+  }
+
+  const [weather, setWeather] = useState<WeatherData | null>(null);
 
   useEffect(() => {
     async function fetchWeather() {
