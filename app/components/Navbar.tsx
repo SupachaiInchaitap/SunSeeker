@@ -1,10 +1,12 @@
 "use client";
 import { useState } from "react";
 import { Search, Menu } from "lucide-react";
+import Today from "./Today";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState("home");
 
   return (
     <>
@@ -36,13 +38,26 @@ export default function Navbar() {
           />
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg">
-              <button className="block px-4 py-2 text-left w-full hover:bg-gray-200">Today</button>
+              <button
+                className="block px-4 py-2 text-left w-full hover:bg-gray-200"
+                onClick={() => {
+                  setCurrentPage("today");
+                  setMenuOpen(false);
+                }}
+              >
+                Today
+              </button>
               <button className="block px-4 py-2 text-left w-full hover:bg-gray-200">Hourly</button>
               <button className="block px-4 py-2 text-left w-full hover:bg-gray-200">Air Quality</button>
             </div>
           )}
         </div>
       </nav>
+
+      {/* Page Content */}
+      <div className="p-4">
+        {currentPage === "today" && <Today />}
+      </div>
     </>
   );
 }
