@@ -1,7 +1,7 @@
 "use client"; 
 
 import React, { useEffect } from 'react';
-import { testSupabaseConnection } from '../supabase/supaBaseTest';
+import { testSupabaseConnection } from '../../utils/supabase/supaBaseTest';
 
 const Home = () => {
   useEffect(() => {
