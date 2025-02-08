@@ -7,10 +7,10 @@ const CITY = "Bangkok";
 export default function WeatherCard() {
   interface WeatherData {
     name: string;
-    main: {
+    main?: {
       temp: number;
     };
-    weather: {
+    weather?: {
       description: string;
     }[];
   }
@@ -30,7 +30,7 @@ export default function WeatherCard() {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 text-center">
-      {weather ? (
+      {weather && weather.main && weather.weather ? (
         <>
           <h2 className="text-xl font-bold">{weather.name}</h2>
           <p className="text-2xl">{weather.main.temp}°C</p>
