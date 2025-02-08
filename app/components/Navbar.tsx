@@ -5,7 +5,7 @@ import Today from "./Today";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState("home");
+  const [currentPage, setCurrentPage] = useState("today");
 
   return (
     <>
@@ -13,7 +13,7 @@ export default function Navbar() {
         {/* Logo Section */}
         <div
           className="flex items-center space-x-3 cursor-pointer"
-          onClick={() => setCurrentPage("home")}
+          onClick={() => setCurrentPage("today")}
         >
           <span className="text-yellow-400 text-3xl">☀️</span>
           <h1 className="text-2xl font-bold tracking-wide">SunSeeker</h1>
@@ -44,15 +44,26 @@ export default function Navbar() {
           >
             Today
           </button>
-          <button className="hover:text-yellow-400 transition duration-300">Hourly</button>
-          <button className="hover:text-yellow-400 transition duration-300">Air Quality</button>
+          <button
+            className="hover:text-yellow-400 transition duration-300"
+            onClick={() => setCurrentPage("hourly")}
+          >
+            Hourly
+          </button>
+          <button
+            className="hover:text-yellow-400 transition duration-300"
+            onClick={() => setCurrentPage("airQuality")}
+          >
+            Air Quality
+          </button>
         </div>
       </div>
 
       {/* Page Content */}
       <div className="p-4">
-        {currentPage === "home" && <div>Welcome to SunSeeker!</div>}
         {currentPage === "today" && <Today />}
+        {currentPage === "hourly" && <div>Hourly Forecast</div>}
+        {currentPage === "airQuality" && <div>Air Quality Information</div>}
       </div>
     </>
   );
