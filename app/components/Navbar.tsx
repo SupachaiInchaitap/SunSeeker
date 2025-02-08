@@ -1,18 +1,20 @@
 "use client";
 import { useState } from "react";
-import { Search, Menu } from "lucide-react";
+import { Search, User } from "lucide-react";
 import Today from "./Today";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState("home");
 
   return (
     <>
       <nav className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-lg rounded-b-2xl">
         {/* Logo Section */}
-        <div className="flex items-center space-x-3">
+        <div
+          className="flex items-center space-x-3 cursor-pointer"
+          onClick={() => setCurrentPage("home")}
+        >
           <span className="text-yellow-400 text-3xl">☀️</span>
           <h1 className="text-2xl font-bold tracking-wide">SunSeeker</h1>
         </div>
@@ -29,33 +31,27 @@ export default function Navbar() {
           />
         </div>
 
-        {/* Menu Icon */}
-        <div className="relative">
-          <Menu
-            size={28}
-            className="cursor-pointer hover:text-yellow-400 transition-transform transform hover:scale-110"
-            onClick={() => setMenuOpen(!menuOpen)}
-          />
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded-lg shadow-lg">
-              <button
-                className="block px-4 py-2 text-left w-full hover:bg-gray-200"
-                onClick={() => {
-                  setCurrentPage("today");
-                  setMenuOpen(false);
-                }}
-              >
-                Today
-              </button>
-              <button className="block px-4 py-2 text-left w-full hover:bg-gray-200">Hourly</button>
-              <button className="block px-4 py-2 text-left w-full hover:bg-gray-200">Air Quality</button>
-            </div>
-          )}
-        </div>
+        {/* Profile Icon */}
+        <User size={28} className="cursor-pointer hover:text-yellow-400 transition-transform transform hover:scale-110" />
       </nav>
+
+      {/* Submenu */}
+      <div className="flex justify-center text-black py-2">
+        <div className="flex space-x-8">
+          <button
+            className="hover:text-yellow-400 transition duration-300"
+            onClick={() => setCurrentPage("today")}
+          >
+            Today
+          </button>
+          <button className="hover:text-yellow-400 transition duration-300">Hourly</button>
+          <button className="hover:text-yellow-400 transition duration-300">Air Quality</button>
+        </div>
+      </div>
 
       {/* Page Content */}
       <div className="p-4">
+        {currentPage === "home" && <div>Welcome to SunSeeker!</div>}
         {currentPage === "today" && <Today />}
       </div>
     </>
