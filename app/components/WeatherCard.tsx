@@ -19,11 +19,16 @@ export default function WeatherCard() {
 
   useEffect(() => {
     async function fetchWeather() {
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric`
-      );
-      const data = await res.json();
-      setWeather(data);
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric`
+        );
+        const data = await res.json();
+        console.log('API response:', data); // Log the API response
+        setWeather(data);
+      } catch (error) {
+        console.error('Error fetching weather data:', error);
+      }
     }
     fetchWeather();
   }, []);
