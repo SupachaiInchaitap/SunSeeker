@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Head from "next/head";
+import "./globals.css";
 
 const WeatherSearch = () => {
   const [query, setQuery] = useState("");
