@@ -1,10 +1,10 @@
 "use client";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Search, User } from "lucide-react";
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState("today");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [temp, setTemp] = useState<number | null>(null);
 
@@ -18,7 +18,6 @@ export default function Navbar() {
           `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric`
         );
         const data = await res.json();
-        
         if (data.main) {
           setTemp(data.main.temp);
         }
@@ -35,7 +34,7 @@ export default function Navbar() {
       {/* Navbar */}
       <nav className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-lg rounded-b-2xl">
         {/* Logo + Weather */}
-        <div className="flex items-center space-x-6 cursor-pointer" onClick={() => setCurrentPage("today")}>
+        <Link href="/" className="flex items-center space-x-6 cursor-pointer">
           <div className="flex items-center space-x-3">
             <span className="text-yellow-400 text-3xl">☀️</span>
             <h1 className="text-2xl font-bold tracking-wide">SunSeeker</h1>
@@ -45,7 +44,7 @@ export default function Navbar() {
           ) : (
             <p className="text-sm text-white/70">Loading...</p>
           )}
-        </div>
+        </Link>
 
         {/* Search Bar */}
         <div className="relative">
@@ -69,7 +68,7 @@ export default function Navbar() {
             onClick={() => setDropdownOpen(!dropdownOpen)}
           />
           {dropdownOpen && (
-            <div id="dropdownMenu" className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
               <button className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
                 My favourite
               </button>
@@ -84,17 +83,15 @@ export default function Navbar() {
       {/* Submenu */}
       <div className="flex justify-center text-black py-2">
         <div className="flex space-x-8">
-          {["today", "hourly", "airQuality"].map((page) => (
-            <button
-              key={page}
-              className={`hover:text-yellow-400 transition duration-300 ${
-                currentPage === page ? "text-yellow-400 font-semibold" : ""
-              }`}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page.charAt(0).toUpperCase() + page.slice(1)}
-            </button>
-          ))}
+          <Link href="/" className="hover:text-yellow-400 transition duration-300">
+            Today
+          </Link>
+          <Link href="/hourly" className="hover:text-yellow-400 transition duration-300">
+            Hourly
+          </Link>
+          <Link href="/airquality" className="hover:text-yellow-400 transition duration-300">
+            Air Quality
+          </Link>
         </div>
       </div>
     </>
