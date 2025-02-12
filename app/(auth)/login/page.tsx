@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { login } from "@/app/(auth)/function/action";
-import { logout } from "@/app/(auth)/function/action"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -57,7 +56,7 @@ export default function LoginPage() {
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      <form action={logout}><button type="submit">logout</button></form>
+      
     </div>
   );
 }
