@@ -62,6 +62,7 @@ export async function signup(formData: FormData) {
   });
 
   if (error) {
+    console.error("Database Insert Error:", error);
     return { error: error.message };
   }
 
