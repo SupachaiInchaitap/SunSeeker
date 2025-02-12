@@ -1,43 +1,80 @@
 "use client";
+import axios from "axios";
+import { useState } from "react";
+import { BsSearch } from "react-icons/bs";
 
-import React, { useState } from "react";
-import Head from "next/head";
-import "./globals.css";
+interface WeatherData {
+  name: string;
+  sys: {
+    country: string;
+  };
+  main: {
+    temp: number;
+  };
+  weather: {
+    description: string;
+  }[];
+}
 
-const WeatherSearch = () => {
-  const [query, setQuery] = useState("");
+export default function WeatherSearch() {
+  const [query, setQuery] = useState<string>("");
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = () => {
-    alert(`Searching for weather in: ${query}`);
+  const fetchWeather = async () => {
+    if (!query) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const API_KEY = process.env.NEXT_PUBLIC_WEATHERMAP_API_KEY;
+      if (!API_KEY) {
+        throw new Error("API key is missing! Add NEXT_PUBLIC_WEATHERMAP_API_KEY to .env.local");
+      }
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${query}&appid=${API_KEY}&units=metric`;
+      const res = await axios.get<WeatherData>(url);
+      setWeather(res.data);
+    } catch (error: unknown) {
+      console.error("Error fetching weather data:", error);
+      setWeather(null);
+      setError("ไม่พบข้อมูล กรุณาลองอีกครั้ง");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <>
-      <Head>
-        <title>Weather Search</title>
-      </Head>
-      <div className="w-full h-screen bg-gray-100 flex items-center justify-center">
-        <div
-          className="w-full max-w-md p-6 bg-white rounded-lg shadow-md"
-          style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-cover bg-center" style={{ backgroundImage: "url('/Designer.jpeg')" }}>
+      <div className="relative w-96 z-10">
+        <input
+          type="text"
+          placeholder="Search a city"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && fetchWeather()}
+          className="w-full p-4 pl-5 pr-12 text-white bg-opacity-50 bg-gray-900 border border-gray-500 rounded-full backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder-white"
+        />
+        <button
+          onClick={fetchWeather}
+          className="absolute top-1/2 right-4 transform -translate-y-1/2 text-white hover:text-yellow-300 transition-colors"
         >
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search your address"
-            className="w-full px-4 py-2 mb-4 text-lg text-gray-700 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <button
-            onClick={handleSearch}
-            className="w-full py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            Search
-          </button>
-        </div>
+          <BsSearch size={24} />
+        </button>
       </div>
-    </>
-  );
-};
 
-export default WeatherSearch;
+      {loading && <p className="text-white mt-6">Loading...</p>}
+      {error && <p className="text-red-500 mt-6">{error}</p>}
+
+      {weather && (
+        <div className="mt-6 p-6 bg-white bg-opacity-20 rounded-xl text-white backdrop-blur-md shadow-lg w-96 text-center">
+          <h2 className="text-2xl font-bold">
+            {weather.name}, {weather.sys.country}
+          </h2>
+          <p className="text-6xl font-semibold mt-2">{Math.round(weather.main.temp)}°C</p>
+          <p className="capitalize mt-2">{weather.weather[0].description}</p>
+        </div>
+      )}
+    </div>
+  );
+}
