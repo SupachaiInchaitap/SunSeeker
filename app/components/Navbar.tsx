@@ -2,12 +2,16 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Search, User } from "lucide-react";
+import { logout } from "@/app/(auth)/function/action";
+import { useUser } from "@supabase/auth-helpers-react"; // Import useUser hook
 
 export default function Navbar() {
   const [query, setQuery] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [temp, setTemp] = useState<number | null>(null);
+  const user = useUser(); // Get the authenticated user
 
+  // Fetch weather data
   useEffect(() => {
     const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
     const CITY = "Bangkok";
@@ -69,12 +73,25 @@ export default function Navbar() {
           />
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-              <button className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
-                My profile
-              </button>
-              <button className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
-                Log out
-              </button>
+              {user ? (
+                <>
+                  <button className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
+                    My favourite
+                  </button>
+                  <form action={logout}>
+                    <button
+                      type="submit"
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
+                    >
+                      Logout
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <Link href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
+                  Login
+                </Link>
+              )}
             </div>
           )}
         </div>
