@@ -29,9 +29,10 @@ export async function updateSession(request: NextRequest) {
 
   console.log("Middleware - User session:", user);
 
-  // Allow unauthenticated users to access the main page ('/')
-  const publicRoutes = ['/', '/about', '/contact'];
-  
+  // Define the routes that can be accessed without authentication
+  const publicRoutes = ['/', '/weather', '/contact'];
+
+  // If user is not authenticated and tries to access a protected route, redirect to login
   if (!user && !publicRoutes.includes(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
