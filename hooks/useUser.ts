@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createClient } from "@/app/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 
 // Create Supabase client only once at the module level
 const supabase = createClient();
