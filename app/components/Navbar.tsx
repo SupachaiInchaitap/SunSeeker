@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BsSearch } from "react-icons/bs";
-import { createClient } from "@/app/utils/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { logout } from "../(auth)/function/action";
 
 async function fetchWeather(city: string) {

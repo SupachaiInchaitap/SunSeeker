@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getUser } from "@/app/utils/supabase/getUser";
+import { getUser } from "@/utils/supabase/getUser";
 import { logout } from "../(auth)/function/action";
 
 export default async function AuthButton() {
