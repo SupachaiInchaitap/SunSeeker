@@ -47,7 +47,7 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      data: { name: username }, 
+      data: { name: username },
     },
   });
 
@@ -82,12 +82,22 @@ export async function insertUserAfterConfirmation() {
   console.log("User confirmed! Inserting into users table...");
 
   // 🔹 Check if user already exists in `users` table
-  const { data: existingUser } = await (await supabase).from("users").select("id").eq("id", userId).single();
+  const { data: existingUser, error: checkError } = await (await supabase)
+    .from("users")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle(); // Use maybeSingle() to avoid errors if no row is found
+
+  if (checkError) {
+    console.error("Error checking existing user:", checkError);
+    return;
+  }
 
   if (existingUser) {
     console.log("User already exists in users table. Skipping insert.");
     return;
   }
+
 
   // 🔹 Insert user data into `users` table
   const { error: dbError } = await (await supabase).from("users").insert([
@@ -111,6 +121,6 @@ export async function logout() {
   const supabase = createClient();
   await (await supabase).auth.signOut();
   // Redirect after logout to the weather page (or anywhere else)
-  redirect("/"); 
+  redirect("/");
 }
 // --------------------------------------------------------
