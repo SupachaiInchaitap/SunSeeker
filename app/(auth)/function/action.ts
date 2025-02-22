@@ -1,49 +1,40 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
-// LOGIN FUNCTION
+// ------------------- LOGIN FUNCTION -------------------
 export async function login(formData: FormData) {
-  const supabase = await createClient();
-  
-  // Check if the user is already logged in
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const supabase = createClient();
 
-  // Prevent login if already authenticated
-  if (user) {
-    // Optionally return a message or handle as needed
-    return { error: "You are already logged in!" }; // Don't redirect here
-  }
-
-  // Get input values
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  // Validate inputs
   if (!email || !password) {
     return { error: "Email and password are required" };
   }
 
   // Attempt login
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await (await supabase).auth.signInWithPassword({ email, password });
 
   if (error) {
-    return { error: error.message }; // Return the error message
+    return { error: error.message };
   }
 
-  // After successful login, redirect to the home page
-  revalidatePath("/", "layout");
-  redirect("/"); // Only redirect after successful login
-}
-//--------------------------------------------------------------------------------------------------------------
-export async function signup(formData: FormData) {
-  const supabase = await createClient();
+  console.log("User logged in:", data.user?.id);
 
-  // Get input values
+  // Insert user into `users` table if email is confirmed
+  await insertUserAfterConfirmation();
+
+  // Redirect after successful login
+  redirect("/"); // Redirect to homepage after login
+}
+// --------------------------------------------------------
+
+// ------------------- SIGNUP FUNCTION -------------------
+export async function signup(formData: FormData) {
+  const supabase = createClient();
+
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const username = formData.get("username") as string;
@@ -52,29 +43,74 @@ export async function signup(formData: FormData) {
     return { error: "Email, password, and username are required" };
   }
 
-  // Attempt signup
-  const { error } = await supabase.auth.signUp({
+  const { error } = await (await supabase).auth.signUp({
     email,
     password,
     options: {
-      data: { name: username }, // Store username in user metadata
+      data: { name: username }, 
     },
   });
 
   if (error) {
-    console.error("Database Insert Error:", error);
+    console.error("Signup Error:", error);
     return { error: error.message };
   }
 
-  // Redirect after successful signup
-  revalidatePath("/", "layout");
-  redirect("/"); // Redirect to home or wherever you need after signup
+  console.log("User signed up. Waiting for email confirmation...");
+  return { message: "Please check your email to confirm your account." };
 }
-//-------------------------------------------------------------------------------------------------------------------
-// LOGOUT FUNCTION
+// --------------------------------------------------------
+
+// ------------------- INSERT USER AFTER CONFIRMATION -------------------
+export async function insertUserAfterConfirmation() {
+  const supabase = createClient();
+  const { data, error } = await (await supabase).auth.getUser();
+
+  if (error || !data?.user) {
+    console.error("Auth Error or User Not Found:", error);
+    return;
+  }
+
+  const userId = data.user.id;
+  const emailConfirmed = data.user.email_confirmed_at;
+
+  if (!emailConfirmed) {
+    console.log("User email not confirmed yet.");
+    return;
+  }
+
+  console.log("User confirmed! Inserting into users table...");
+
+  // 🔹 Check if user already exists in `users` table
+  const { data: existingUser } = await (await supabase).from("users").select("id").eq("id", userId).single();
+
+  if (existingUser) {
+    console.log("User already exists in users table. Skipping insert.");
+    return;
+  }
+
+  // 🔹 Insert user data into `users` table
+  const { error: dbError } = await (await supabase).from("users").insert([
+    {
+      id: userId,
+      username: data.user.user_metadata.name, // Get username from metadata
+    },
+  ]);
+
+  if (dbError) {
+    console.error("Database Insert Error:", dbError);
+  } else {
+    console.log("User successfully inserted into users table!");
+  }
+}
+// --------------------------------------------------------
+
+// ------------------- LOGOUT FUNCTION -------------------
 export async function logout() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  revalidatePath("/", "layout");
-  redirect("/");
+  "use server";
+  const supabase = createClient();
+  await (await supabase).auth.signOut();
+  // Redirect after logout to the weather page (or anywhere else)
+  redirect("/weather"); 
 }
+// --------------------------------------------------------
