@@ -111,6 +111,6 @@ export async function logout() {
   const supabase = createClient();
   await (await supabase).auth.signOut();
   // Redirect after logout to the weather page (or anywhere else)
-  redirect("/weather"); 
+  redirect("/"); 
 }
 // --------------------------------------------------------
