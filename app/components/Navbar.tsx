@@ -1,98 +1,108 @@
-// /components/Navbar.tsx
-"use client";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Search, User } from "lucide-react";
-import { logout } from "@/app/(auth)/function/action";
-import { useUser } from "@supabase/auth-helpers-react"; // Import useUser hook
+import { BsSearch } from "react-icons/bs";
+import { createClient } from "@/utils/supabase/server";
+import { logout } from "../(auth)/function/action";
 
-export default function Navbar() {
-  const [query, setQuery] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [temp, setTemp] = useState<number | null>(null);
-  const user = useUser(); // Get the authenticated user
+async function fetchWeather(city: string) {
+  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+  if (!API_KEY) {
+    throw new Error("API key is missing! Add NEXT_PUBLIC_WEATHER_API_KEY to .env.local");
+  }
 
-  // Fetch weather data
-  useEffect(() => {
-    const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-    const CITY = "Bangkok";
+  try {
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
+    );
 
-    async function fetchWeather() {
-      try {
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?q=${CITY}&appid=${API_KEY}&units=metric`
-        );
-        const data = await res.json();
-        if (data.main) {
-          setTemp(data.main.temp);
-        }
-      } catch (error) {
-        console.error("Error fetching weather data:", error);
-      }
+    if (!res.ok) {
+      return null;
     }
 
-    fetchWeather();
-  }, []);
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+    return null;
+  }
+}
+
+export default async function Navbar({ searchParams }: { searchParams?: { q?: string } }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser(); // Fetch user on server
+
+  const city = searchParams?.q || "Bangkok";
+  const weather = await fetchWeather(city);
 
   return (
     <>
-      {/* Navbar */}
-      <nav className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-lg rounded-b-2xl">
+      <nav className="relative flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-4 shadow-lg rounded-b-2xl z-10">
         {/* Logo + Weather */}
         <Link href="/" className="flex items-center space-x-6 cursor-pointer">
           <div className="flex items-center space-x-3">
             <span className="text-yellow-400 text-3xl">☀️</span>
             <h1 className="text-2xl font-bold tracking-wide">SunSeeker</h1>
           </div>
-          {temp !== null ? (
-            <p className="text-lg text-white/90">Bangkok {temp}°C</p>
+          {weather ? (
+            <p className="text-lg text-white/90">
+              {weather.name}, {weather.sys.country} {Math.round(weather.main.temp)}°C
+            </p>
           ) : (
-            <p className="text-sm text-white/70">Loading...</p>
+            <p className="text-sm text-white/70">Weather data unavailable</p>
           )}
         </Link>
 
         {/* Search Bar */}
-        <div className="relative">
+        <form action="/" method="get" className="relative">
           <div className="flex items-center space-x-2 bg-white text-black rounded-full px-4 py-2 shadow-inner w-60 md:w-72 lg:w-96">
-            <Search size={20} className="text-gray-500" />
+            <BsSearch size={20} className="text-gray-500" />
             <input
               type="text"
+              name="q"
               className="outline-none bg-transparent w-full placeholder-gray-400"
               placeholder="Search city..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
             />
           </div>
-        </div>
+        </form>
 
-        {/* Profile Dropdown */}
-        <div className="relative">
-          <User
-            size={28}
-            className="cursor-pointer hover:text-yellow-400 transition-transform transform hover:scale-110"
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-          />
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20">
-              {user ? (
-                <>
-                  <button className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
-                    My favourite
-                  </button>
-                  <form action={logout}>
-                    <button
-                      type="submit"
-                      className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
-                    >
+        {/* Authentication Section */}
+        <div className="relative z-30">
+          {user ? (
+            <details className="dropdown dropdown-bottom dropdown-end group">
+              <summary className="w-full py-4 px-6 flex justify-between items-center bg-white text-black border-2 border-red-500 rounded-lg cursor-pointer">
+                <span className="flex gap-3 items-center">
+                  <i className="fa-solid fa-user text-xl"></i>
+                  <h1 className="font-semibold">{user.email}</h1>
+                </span>
+                <i className="fa-solid fa-chevron-down text-xl"></i>
+              </summary>
+
+              {/* Dropdown Menu */}
+              <ul className="menu dropdown-content shadow bg-white w-72 mt-3 text-secondary rounded-lg rounded-tr-none p-0 absolute top-full left-0n z-40">
+                <li className="hover:bg-gray-100 duration-200 py-2 rounded-t-lg">
+                  <Link href="/profile" className="text-black flex gap-5">
+                    <h1> {user.email} </h1>
+                  </Link>
+                </li>
+                <li>
+                  <form action={logout} method="POST" className="flex gap-5 hover:bg-gray-100 duration-200 py-4 rounded-b-lg">
+                    <i className="fa-solid fa-right-from-bracket text-xl"></i>
+                    <button type="submit" className="text-black w-full text-left ">
                       Logout
                     </button>
                   </form>
-                </>
-              ) : (
-                <Link href="/login" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left">
-                  Login
-                </Link>
-              )}
+                </li>
+              </ul>
+            </details>
+          ) : (
+            <div className="flex gap-3">
+              <Link href="/login" className="py-2 px-5 flex rounded-md border hover:bg-white hover:text-primary duration-300">
+                Login
+              </Link>
+              <Link href="/signup" className="py-2 px-5 flex rounded-md border hover:bg-white hover:text-primary duration-300">
+                Sign Up
+              </Link>
             </div>
           )}
         </div>

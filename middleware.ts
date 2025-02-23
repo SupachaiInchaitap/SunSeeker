@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
 
   // Do not redirect if the user is trying to access the main page or login/signup
-  if (url.pathname === '/' || url.pathname === '/login' || url.pathname === '/signup') {
+  if (url.pathname === '/' || url.pathname === '/login' || url.pathname === '/signup' || url.pathname === '/weather' ) {
     return NextResponse.next()
   }
 

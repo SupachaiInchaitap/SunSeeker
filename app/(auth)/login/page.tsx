@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { login } from "@/app/(auth)/function/action";
+import { login, logout } from "@/app/(auth)/function/action";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -56,7 +56,15 @@ export default function LoginPage() {
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>
-      
+
+      <form action={logout}>
+        <button
+          type="submit"
+          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
+        >
+          Logout
+        </button>
+      </form>
     </div>
   );
 }
