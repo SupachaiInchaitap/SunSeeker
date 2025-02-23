@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 
+// Interface สำหรับ JSON ที่ได้จาก API
+interface WeatherData {
+  dt: number;
+  main: {
+    temp: number;
+  };
+  weather: { description: string; icon: string }[];
+}
+
+// Interface สำหรับข้อมูลพยากรณ์ที่ใช้ใน State
 interface HourlyWeather {
   dt: number;
   temp: number;
@@ -14,13 +24,21 @@ const city = "Bangkok";
 
 export default function Hourly() {
   const [hourlyData, setHourlyData] = useState<HourlyWeather[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchHourlyWeather = async () => {
+      if (!apiKey) {
+        setError("API Key is missing. Please check your .env.local file.");
+        setLoading(false);
+        return;
+      }
+
       try {
-        // ดึงพิกัดของเมืองจาก Weather API
+        console.log("API Key:", apiKey);
+
+        // ดึงค่าพิกัดของเมือง
         const locationRes = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
         );
@@ -38,8 +56,17 @@ export default function Hourly() {
         }
         const hourlyData = await hourlyRes.json();
 
-        // กรองเฉพาะ 6 ชั่วโมงถัดไป
-        setHourlyData(hourlyData.list.slice(0, 6));
+        // ตรวจสอบโครงสร้างของ JSON
+        console.log("Hourly Data:", hourlyData);
+
+        // อัปเดต state โดยใช้ temp จาก main
+        setHourlyData(
+          hourlyData.list.slice(0, 6).map((hour: WeatherData) => ({
+            dt: hour.dt,
+            temp: hour.main.temp, // ✅ ใช้ข้อมูลอุณหภูมิจาก `main.temp`
+            weather: hour.weather,
+          }))
+        );
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -60,6 +87,8 @@ export default function Hourly() {
           <p className="text-lg text-gray-800">Loading hourly data...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
+        ) : hourlyData.length === 0 ? (
+          <p className="text-gray-600">No weather data available</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {hourlyData.map((hour) => (
@@ -67,7 +96,9 @@ export default function Hourly() {
                 key={hour.dt}
                 className="p-4 border border-gray-200 rounded-lg bg-white shadow-md flex flex-col items-center"
               >
-                <p className="text-lg font-medium">{new Date(hour.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+                <p className="text-lg font-medium">
+                  {new Date(hour.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
                 <img src={`https://openweathermap.org/img/wn/${hour.weather[0].icon}@2x.png`} alt={hour.weather[0].description} />
                 <p className="text-xl">{Math.round(hour.temp)}°C</p>
                 <p className="text-sm text-gray-600">{hour.weather[0].description}</p>
