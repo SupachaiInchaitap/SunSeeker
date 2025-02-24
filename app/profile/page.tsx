@@ -1,7 +1,8 @@
-// app/profile/page.tsx
 import { getUser } from "@/utils/supabase/getUser";
-import Navbar from "../components/Navbar"; // Make sure this path is correct!
+import Navbar from "../components/Navbar";
 import { createClient } from "@supabase/supabase-js";
+import { Suspense } from "react";
+import TemperatureGraphWrapper from "../components/TemperatureChartBox";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -37,7 +38,7 @@ async function getWeather(lat: number, lon: number): Promise<WeatherData | null>
 
 async function getUserFavorites(userId: string) {
   const { data, error } = await supabase
-    .from("favorites")
+    .from("user_favorites")
     .select("city_name, lat, lon")
     .eq("user_id", userId);
 
@@ -50,16 +51,18 @@ async function getUserFavorites(userId: string) {
 }
 
 export default async function ProfilePage() {
-  // Fetch user data server-side
   const user = await getUser();
 
-  // If no user is found (not logged in), you can redirect or show a message
   if (!user) {
     return (
       <div className="w-full h-screen flex flex-col justify-center items-center text-center">
         <Navbar />
-        <h1 className="text-2xl font-semibold text-red-500">You are not logged in.</h1>
-        <p className="text-gray-600 mt-2">Please log in to view your profile.</p>
+        <h1 className="text-2xl font-semibold text-red-500">
+          You are not logged in.
+        </h1>
+        <p className="text-gray-600 mt-2">
+          Please log in to view your profile.
+        </p>
       </div>
     );
   }
@@ -77,51 +80,69 @@ export default async function ProfilePage() {
     )
   );
 
+  // Prepare data for the graph
+  const graphData = weatherData
+    .filter((item) => item.weather)
+    .map((item) => ({
+      cityName: item.cityName,
+      temp: item.weather?.main.temp ?? 0, // Default to 0 if undefined
+    }));
+
   return (
     <div className="w-full h-screen flex flex-col">
       <Navbar />
       <div className="flex flex-grow">
-        {/* Left Profile Section */}
-        <div className="w-1/3 bg-white p-6 rounded-tr-2xl shadow-lg flex flex-col items-center">
-          <img
-            src="https://i.pravatar.cc/150?img=3" // Placeholder avatar
-            alt="User Avatar"
-            className="w-24 h-24 rounded-full mb-4 border-4 border-primary"
-          />
-          <h1 className="text-2xl font-bold text-primary mb-2">{user.email}</h1>
-          <p className="text-gray-600">Welcome to your profile page!</p>
-
-          <div className="mt-4">
-            <button className="py-2 px-6 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition duration-300">
-              Edit Profile
-            </button>
+        {/* Left Sidebar - User Profile */}
+        <div className="w-1/3 bg-white p-6 border-r border-gray-300">
+          <h2 className="text-2xl font-semibold text-secondary mb-4">Profile</h2>
+          <div className="flex flex-col items-center">
+            {/* Placeholder Profile Image */}
+            <div className="w-24 h-24 rounded-full bg-gray-300 mb-4"></div>
+            <p className="text-lg font-semibold">{user.email}</p>
+            <p className="text-gray-600">Welcome back!</p>
           </div>
         </div>
 
-        {/* Right Favorites Section */}
+        {/* Main Content - Favorites and Graph */}
         <div className="w-2/3 bg-gray-100 p-6 overflow-y-auto">
-          <h2 className="text-2xl font-semibold text-secondary mb-4">Your Favorites</h2>
+          <h2 className="text-2xl font-semibold text-secondary mb-4">
+            Your Favorites
+          </h2>
           <div className="space-y-4">
             {weatherData.length > 0 ? (
-              weatherData.map((item, index) => (
+              weatherData.map((item, index) =>
                 item.weather ? (
                   <div
                     key={index}
                     className="bg-white p-4 rounded-lg shadow hover:shadow-lg transition duration-300"
                   >
                     <h3 className="text-xl font-bold">{item.cityName}</h3>
-                    <p className="text-gray-600">{item.weather.weather[0].description} - {item.weather.main.temp}°C</p>
+                    <p className="text-gray-600">
+                      {item.weather.weather[0].description} -{" "}
+                      {item.weather.main.temp}°C
+                    </p>
                   </div>
                 ) : (
-                  <p key={index} className="text-gray-600">No data available</p>
+                  <p key={index} className="text-gray-600">
+                    No data available
+                  </p>
                 )
-              ))
+              )
             ) : (
               <p className="text-gray-600">No favorites added yet.</p>
             )}
           </div>
+
+          {/* Graph Section */}
+          <div className="mt-8 bg-white p-4 rounded-lg shadow">
+            <h3 className="text-xl font-semibold mb-4">Temperature Graph</h3>
+            <Suspense fallback={<p>Loading graph...</p>}>
+              <TemperatureGraphWrapper graphData={graphData} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>
+
   );
 }

@@ -32,7 +32,7 @@ export default async function Home() {
   );
   const data = await res.json();
 
-  console.log("API Response:", data); // Add this line to log the response
+  // console.log("API Response:", data); // Add this line to log the response
   
   const weatherData: WeatherData = {
     main: {

@@ -15,19 +15,8 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
   useEffect(() => {
     const checkFavorite = async () => {
       try {
-        const token = localStorage.getItem("supabase.auth.token");
-        const authToken = token ? JSON.parse(token).currentSession.access_token : null;
-        console.log("Auth Token:", authToken);
-
-        if (!authToken) {
-          console.warn("No auth token found.");
-          return;
-        }
-
         const res = await fetch(`/auth/favorite/add?city=${city}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
+          credentials: "include", // Include cookies in request
         });
 
         if (!res.ok) {
@@ -36,7 +25,6 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
         }
 
         const data = await res.json();
-        console.log("Favorite Data:", data);
         setIsFavorite(data.isFavorite);
       } catch (error) {
         console.error("Failed to check favorite:", error);
@@ -50,16 +38,6 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("supabase.auth.token");
-      const authToken = token ? JSON.parse(token).currentSession.access_token : null;
-
-      if (!authToken) {
-        console.warn("No auth token found. User might not be logged in.");
-        alert("You must be logged in to add favorites.");
-        setLoading(false);
-        return;
-      }
-
       const endpoint = "/auth/favorite/add";
       const method = isFavorite ? "DELETE" : "POST";
       const body = JSON.stringify({ city, lat, lon });
@@ -68,9 +46,9 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
         },
         body: method === "POST" ? body : JSON.stringify({ city }),
+        credentials: "include", // Include cookies in request
       });
 
       if (!res.ok) {
@@ -84,7 +62,7 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
     } catch (error) {
       console.error("Failed to update favorite:", error);
     } finally {
-      setLoading(false); // Ensure loading state is always reset
+      setLoading(false);
     }
   };
 
@@ -94,7 +72,7 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
       className={`mt-4 px-4 py-2 rounded-lg shadow-md transition-colors duration-300 ${
         isFavorite ? "bg-red-500 text-white" : "bg-gray-300 text-gray-800"
       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-      disabled={loading} // Only disable when loading
+      disabled={loading}
     >
       {loading ? "Loading..." : isFavorite ? "Remove from Favorites" : "Add to Favorites"}
     </button>

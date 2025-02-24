@@ -1,43 +1,30 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getUser } from "@/utils/supabase/getUser"; // Make sure this path is correct!
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 
-// Initialize Supabase client
-const supabase = createClient(
+const supabase = createServerClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    cookies: {
+      get: async (name) => (await cookies()).get(name)?.value,
+    },
+  }
 );
 
-// Helper function to get user from token
-async function getUserFromToken(request: Request) {
-  const token = request.headers.get('authorization')?.replace('Bearer ', '');
-  if (!token) return null;
-
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser(token);
-
-  if (error || !user) {
-    console.error("Supabase Error:", error);
-    return null;
-  }
-
-  return user;
-}
-
-// GET: Check if city is favorite
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const city = searchParams.get("city");
-
-  const user = await getUserFromToken(request);
+  const user = await getUser();
 
   if (!user) {
     return NextResponse.json({ isFavorite: false }, { status: 401 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const city = searchParams.get("city");
+
   const { data, error } = await supabase
-    .from("favorites")
+    .from("user_favorites")
     .select("*")
     .eq("user_id", user.id)
     .eq("city_name", city);
@@ -50,17 +37,16 @@ export async function GET(request: Request) {
   return NextResponse.json({ isFavorite: data.length > 0 });
 }
 
-// POST: Add city to favorites
 export async function POST(request: Request) {
-  const { city, lat, lon } = await request.json();
-
-  const user = await getUserFromToken(request);
+  const user = await getUser();
 
   if (!user) {
     return NextResponse.json({ success: false }, { status: 401 });
   }
 
-  const { error } = await supabase.from("favorites").insert({
+  const { city, lat, lon } = await request.json();
+
+  const { error } = await supabase.from("user_favorites").insert({
     user_id: user.id,
     city_name: city,
     lat,
@@ -75,18 +61,17 @@ export async function POST(request: Request) {
   return NextResponse.json({ success: true });
 }
 
-// DELETE: Remove city from favorites
 export async function DELETE(request: Request) {
-  const { city } = await request.json();
-
-  const user = await getUserFromToken(request);
+  const user = await getUser();
 
   if (!user) {
     return NextResponse.json({ success: false }, { status: 401 });
   }
 
+  const { city } = await request.json();
+
   const { error } = await supabase
-    .from("favorites")
+    .from("user_favorites")
     .delete()
     .eq("user_id", user.id)
     .eq("city_name", city);
