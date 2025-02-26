@@ -21,7 +21,8 @@ interface WeatherData {
 }
 
 interface CurrentWeatherProps {
-  weatherData: WeatherData;
+  lat: number;
+  lon: number;
 }
 
 const getAirQualityMessage = (aqi: number): string => {
@@ -33,13 +34,13 @@ const getAirQualityMessage = (aqi: number): string => {
   return "Hazardous";
 };
 
-export default async function CurrentWeather({ weatherData }: CurrentWeatherProps) {
-  const city = "Bangkok";
+export default async function CurrentWeather({ lat, lon }: CurrentWeatherProps) {
   let currentWeather: WeatherData | null = null;
   let error = null;
 
   try {
-    currentWeather = await getWeatherData(city);
+    // Get current weather using latitude and longitude
+    currentWeather = await getWeatherData(lat, lon, "current");
   } catch (err) {
     error = err instanceof Error ? err.message : "Unknown error";
   }
@@ -67,9 +68,12 @@ export default async function CurrentWeather({ weatherData }: CurrentWeatherProp
           <p className="text-lg text-gray-700">
             <strong>Air Quality:</strong> {getAirQualityMessage(currentWeather.airQuality.aqi)}
           </p>
-          <h2 className="text-2xl font-bold mb-2">{weatherData.name}</h2>
-          <p>Latitude: {weatherData.coord.lat}</p>
-          <p>Longitude: {weatherData.coord.lon}</p>
+          <p className="text-lg text-gray-700">
+            <strong>Latitude:</strong> {currentWeather.coord.lat}
+          </p>
+          <p className="text-lg text-gray-700">
+            <strong>Longitude:</strong> {currentWeather.coord.lon}
+          </p>
         </div>
       ) : (
         <p className="text-gray-700 text-lg">No data available</p>

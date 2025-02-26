@@ -59,7 +59,7 @@ export default async function Navbar({ searchParams }: { searchParams?: { q?: st
             <BsSearch size={20} className="text-gray-500" />
             <input
               type="text"
-              name="q"
+              name="q"  // This will be sent as `q` in the URL
               className="outline-none bg-transparent w-full placeholder-gray-400"
               placeholder="Search city..."
             />

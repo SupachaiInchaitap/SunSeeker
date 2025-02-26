@@ -1,21 +1,41 @@
 // app/components/TemperatureGraphWrapper.tsx
 "use client";
 
-import dynamic from "next/dynamic";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface TemperatureGraphProps {
   graphData: {
-    cityName: string;
+    time: string;
     temp: number;
   }[];
 }
 
-const TemperatureGraph = dynamic(() => import("./TemperatureChart"), {
-  ssr: false,
-});
-
 export default function TemperatureGraphWrapper({
   graphData,
 }: TemperatureGraphProps) {
-  return <TemperatureGraph graphData={graphData} />;
+  return (
+    <ResponsiveContainer width="100%" height={400}>
+      <LineChart data={graphData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="time" />
+        <YAxis domain={["auto", "auto"]} />
+        <Tooltip />
+        <Line
+          type="monotone"
+          dataKey="temp"
+          stroke="#8884d8"
+          strokeWidth={2}
+          dot={false}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
 }
