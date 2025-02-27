@@ -10,11 +10,18 @@ import CurrentWeather from "../components/CurrentWeather";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+
 // Use Service Role Key to bypass RLS securely
 const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
 async function getUserFavorites(userId: string) {
-  // Fetching favorites securely with Service Role Key
+  if (!userId) {
+    console.error("No user ID found. User is not authorized.");
+    return [];
+  }
+
+  console.log("User ID found. User is authorized.");
+
   const { data: favorites, error } = await supabaseAdmin
     .from("user_favorites")
     .select("city_name, lat, lon")
@@ -28,6 +35,7 @@ async function getUserFavorites(userId: string) {
   console.log("Fetched favorites:", favorites);
   return favorites;
 }
+
 
 // Helper Function to Format Data for the Graph
 async function getTemperatureData(lat: number, lon: number, cityName: string) {

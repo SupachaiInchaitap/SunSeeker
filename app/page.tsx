@@ -27,7 +27,8 @@ async function fetchWeather(city: string): Promise<WeatherData | null> {
 }
 
 export default async function Home({ searchParams }: { searchParams: { q?: string } }) {
-  const city = searchParams.q || "Bangkok"; // Default to Bangkok if no city is searched
+  const params = await searchParams;  // Await searchParams here
+  const city = params.q || "Bangkok"; // Now safely access the query parameter
 
   // Fetch weather data to get latitude and longitude
   const weatherData = await fetchWeather(city);
