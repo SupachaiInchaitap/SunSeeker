@@ -1,7 +1,7 @@
 // app/page.tsx
 import Navbar from "./components/Navbar";
 import CurrentWeather from "./components/CurrentWeather";
-import FavoriteButton from "./components/FavoriteButton";
+import FavoriteButton from "./components/favoriteButton";
 
 interface WeatherData {
   coord: {
