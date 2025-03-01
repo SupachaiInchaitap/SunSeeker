@@ -47,7 +47,7 @@ export async function signup(formData: FormData) {
     email,
     password,
     options: {
-      data: { name: username },
+      data: { display_name: username }, // Store username in the `display_name` field in Supabase Auth
     },
   });
 
@@ -98,12 +98,16 @@ export async function insertUserAfterConfirmation() {
     return;
   }
 
+  // 🔹 Get username and email from user metadata (stored in `display_name` and `email`)
+  const username = data.user.user_metadata.display_name;
+  const email = data.user.email;
 
-  // 🔹 Insert user data into `users` table
+  // 🔹 Insert user data (username and email) into `users` table (custom table)
   const { error: dbError } = await (await supabase).from("users").insert([
     {
       id: userId,
-      username: data.user.user_metadata.name, // Get username from metadata
+      username: username, // Insert username
+      email: email,       // Insert email
     },
   ]);
 
@@ -113,7 +117,7 @@ export async function insertUserAfterConfirmation() {
     console.log("User successfully inserted into users table!");
   }
 }
-// --------------------------------------------------------
+
 
 // ------------------- LOGOUT FUNCTION -------------------
 export async function logout() {

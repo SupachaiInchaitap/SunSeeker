@@ -6,17 +6,22 @@ interface FavoriteButtonProps {
   city: string;
   lat: number;
   lon: number;
+  user: {
+    id: string;
+  } | null;
 }
 
-export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) {
+export default function FavoriteButton({ city, lat, lon, user }: FavoriteButtonProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const checkFavorite = async () => {
+      if (!user) return; // Don't check if not authenticated
+
       try {
         const res = await fetch(`/auth/favorite/add?city=${city}`, {
-          credentials: "include", // Include cookies in request
+          credentials: "include",
         });
 
         if (!res.ok) {
@@ -32,9 +37,14 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
     };
 
     checkFavorite();
-  }, [city]);
+  }, [city, user]);
 
   const handleFavorite = async () => {
+    if (!user) {
+      alert("Please log in to add to favorites.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -48,7 +58,7 @@ export default function FavoriteButton({ city, lat, lon }: FavoriteButtonProps) 
           "Content-Type": "application/json",
         },
         body: method === "POST" ? body : JSON.stringify({ city }),
-        credentials: "include", // Include cookies in request
+        credentials: "include",
       });
 
       if (!res.ok) {

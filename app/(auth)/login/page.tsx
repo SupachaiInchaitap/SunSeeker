@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { login, logout } from "@/app/(auth)/function/action";
+import { login } from "@/app/(auth)/function/action";
+import Link from "next/link"; // Import Link for navigation
+import { AiOutlineArrowLeft } from "react-icons/ai"; // Importing a back arrow icon
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -27,44 +29,48 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-80">
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-blue-100">
+      <div className="flex flex-grow justify-center items-center px-6 py-10">
+        <div className="w-full md:w-1/3 bg-white rounded-3xl shadow-lg p-6 border-t-4 border-blue-400">
+          <Link href="/" className="absolute top-6 left-6 text-gray-700 hover:text-blue-500">
+            <AiOutlineArrowLeft size={24} />
+          </Link>
+          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Login</h2>
 
-        {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
+          {error && <p className="text-red-500 text-sm mb-3">{error}</p>}
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded mb-3"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded mb-3"
-        />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border rounded-xl shadow-sm"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border rounded-xl shadow-sm"
+            />
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white p-3 rounded-xl font-semibold hover:bg-blue-600"
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded"
-          disabled={loading}
-        >
-          {loading ? "Logging in..." : "Login"}
-        </button>
-      </form>
-
-      <form action={logout}>
-        <button
-          type="submit"
-          className="block px-4 py-2 text-gray-800 hover:bg-gray-200 w-full text-left"
-        >
-          Logout
-        </button>
-      </form>
+          <p className="text-center mt-4 text-gray-700">
+            Don&apos;t have an account?{" "}
+            <Link href="/signup" className="text-blue-500 hover:underline">
+              Sign Up
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
