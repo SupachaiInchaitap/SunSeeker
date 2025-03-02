@@ -7,7 +7,7 @@ export default async function AirQualityPage({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined };
 }) {
-  // Narrow down searchParams.q to string or fallback to "Bangkok"
+  // Ensure searchParams.q is a string or fallback to "Bangkok"
   const city = typeof searchParams?.q === "string" ? searchParams.q : "Bangkok";
 
   // Function to get the coordinates of the city
@@ -38,7 +38,7 @@ export default async function AirQualityPage({
   if (!coords) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-        <Navbar targetPage="/airquality" searchParams={{ q: city }} /> {/* Ensure proper type */}
+        <Navbar targetPage="/airquality" searchParams={{ q: city }} />
         <div className="flex flex-col items-center justify-center min-h-screen px-6">
           <div className="bg-white shadow-md rounded-lg p-6 text-center max-w-lg">
             <h1 className="text-3xl font-semibold text-gray-800">Air Quality Index</h1>
@@ -55,10 +55,8 @@ export default async function AirQualityPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-      {/* Navbar stays outside the main container */}
-      <Navbar targetPage="/airquality" searchParams={{ q: city }} /> {/* Ensure proper type */}
+      <Navbar targetPage="/airquality" searchParams={{ q: city }} />
 
-      {/* Main Content */}
       <div className="flex flex-col items-center px-6 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800">Air Quality Index</h1>
@@ -67,7 +65,6 @@ export default async function AirQualityPage({
           </p>
         </div>
 
-        {/* Graph Container */}
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-8">
           {graphData.length > 0 ? (
             <AirQualityGraph graphData={graphData} />
