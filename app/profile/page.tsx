@@ -68,7 +68,9 @@ export default async function ProfilePage() {
   if (!user) {
     return (
       <div className="w-full h-screen flex flex-col justify-center items-center text-center">
-        <Navbar />
+        <Navbar searchParams={{
+          q: undefined
+        }} />
         <h1 className="text-3xl font-bold text-red-500">
           You are not logged in.
         </h1>
@@ -85,7 +87,9 @@ export default async function ProfilePage() {
   if (!userDetails) {
     return (
       <div className="w-full h-screen flex flex-col justify-center items-center text-center">
-        <Navbar />
+        <Navbar searchParams={{
+          q: undefined
+        }} />
         <h1 className="text-3xl font-bold text-red-500">Error fetching user data.</h1>
         <p className="text-gray-600 mt-2">Please try again later.</p>
       </div>
@@ -105,7 +109,9 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 to-blue-400">
-      <Navbar />
+      <Navbar searchParams={{
+        q: undefined
+      }} />
       <div className="flex flex-grow flex-col md:flex-row gap-6 px-6 py-10">
         <div className="w-full md:w-1/3 bg-white rounded-3xl shadow-lg p-6 border-t-4 border-blue-400">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Profile</h2>

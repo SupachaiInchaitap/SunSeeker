@@ -2,39 +2,43 @@ import Navbar from "../components/Navbar";
 import AirQualityGraph from "../components/AirQualityGraph";
 import { getAirQualityData } from "../components/GetAirQuality";
 
-interface PageProps {
-  searchParams?: Record<string, string | string[] | undefined>;
-}
-
-async function getCoordinates(city: string) {
-  const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-  if (!API_KEY) {
-    throw new Error("API key is missing! Add NEXT_PUBLIC_WEATHER_API_KEY to .env.local");
-  }
-
-  const res = await fetch(
-    `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`
-  );
-
-  if (!res.ok) {
-    return null;
-  }
-
-  const data = await res.json();
-  return {
-    lat: data.coord.lat,
-    lon: data.coord.lon,
-  };
-}
-
-export default async function AirQualityPage({ searchParams }: PageProps) {
+export default async function AirQualityPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) {
+  // Narrow down searchParams.q to string or fallback to "Bangkok"
   const city = typeof searchParams?.q === "string" ? searchParams.q : "Bangkok";
+
+  // Function to get the coordinates of the city
+  async function getCoordinates(city: string) {
+    const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+    if (!API_KEY) {
+      throw new Error("API key is missing! Add NEXT_PUBLIC_WEATHER_API_KEY to .env.local");
+    }
+
+    const res = await fetch(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`
+    );
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    return {
+      lat: data.coord.lat,
+      lon: data.coord.lon,
+    };
+  }
+
   const coords = await getCoordinates(city);
 
+  // If city is not found, show an error message
   if (!coords) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-        <Navbar targetPage="/air-quality" searchParams={searchParams} />
+        <Navbar targetPage="/airquality" searchParams={{ q: city }} /> {/* Ensure proper type */}
         <div className="flex flex-col items-center justify-center min-h-screen px-6">
           <div className="bg-white shadow-md rounded-lg p-6 text-center max-w-lg">
             <h1 className="text-3xl font-semibold text-gray-800">Air Quality Index</h1>
@@ -52,7 +56,7 @@ export default async function AirQualityPage({ searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
       {/* Navbar stays outside the main container */}
-      <Navbar targetPage="/airquality" searchParams={searchParams} />
+      <Navbar targetPage="/airquality" searchParams={{ q: city }} /> {/* Ensure proper type */}
 
       {/* Main Content */}
       <div className="flex flex-col items-center px-6 py-12">

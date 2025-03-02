@@ -2,7 +2,6 @@ export async function getAirQualityData(lat: number, lon: number) {
   const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
   
   try {
-    console.log("Fetching 24-Hour Historical Air Quality Data...");
 
     const now = Math.floor(Date.now() / 1000); // Current timestamp
     const oneDayAgo = now - 86400; // 24 hours ago
@@ -12,14 +11,13 @@ export async function getAirQualityData(lat: number, lon: number) {
     );
 
     if (!response.ok) {
-      console.error("Response Status:", response.status);
       const errorText = await response.text();
       console.error("Error Response Text:", errorText);
       throw new Error("Failed to fetch historical air quality data");
     }
 
     const airQualityData = await response.json();
-    console.log("Air Quality History Data:", JSON.stringify(airQualityData, null, 2));
+
 
     // Extract hourly AQI data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -3,6 +3,7 @@ import { BsSearch } from "react-icons/bs";
 import { createClient } from "@/utils/supabase/server";
 import { logout } from "../(auth)/function/action";
 
+// Fetch weather data for a city
 async function fetchWeather(city: string) {
   const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
   if (!API_KEY) {
@@ -27,7 +28,7 @@ async function fetchWeather(city: string) {
 }
 
 interface NavbarProps {
-  searchParams?: { q?: string };
+  searchParams: { q?: string }; // Ensure searchParams is always passed
   targetPage?: string;
 }
 
@@ -37,7 +38,8 @@ export default async function Navbar({ searchParams, targetPage = "/" }: NavbarP
     data: { user },
   } = await supabase.auth.getUser();
 
-  const city = searchParams?.q || "Bangkok";
+  // Ensure searchParams is awaited before accessing
+  const city = searchParams?.q || "Bangkok"; // Ensure default city if q is undefined
   const weather = await fetchWeather(city);
 
   return (
@@ -67,7 +69,7 @@ export default async function Navbar({ searchParams, targetPage = "/" }: NavbarP
               name="q"
               className="outline-none bg-transparent w-full placeholder-gray-400"
               placeholder="Search city..."
-              defaultValue={searchParams?.q || ""}
+              defaultValue={city}  // Use the city directly here
             />
           </div>
         </form>

@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar";
 import HourlyForecast from "../components/HourlyForecast"; // นำเข้า HourlyForecast
 
-// ส่งออก `HourlyWeather` จาก page.tsx
 export interface HourlyWeather {
   dt: number;
   temp: number;
@@ -64,16 +63,15 @@ interface WeatherData {
 }
 
 export default async function Hourly({ searchParams }: { searchParams?: { q?: string } }) {
-  // Use the query parameter or default to Bangkok
-  const city = searchParams?.q || "Bangkok";
-  const { hourlyData, error } = await fetchHourlyWeather(city);  
+  // Ensure searchParams is awaited before accessing
+  const city = searchParams?.q || "Bangkok";  // Default value if searchParams.q is undefined
+
+  const { hourlyData, error } = await fetchHourlyWeather(city);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-      {/* Navbar stays outside container */}
-      <Navbar searchParams={searchParams} targetPage="/hourly" />
+      <Navbar searchParams={searchParams || { q: city }} targetPage="/hourly" />
 
-      {/* Main Content */}
       <div className="flex flex-col items-center px-6 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800">Hourly Forecast</h1>
@@ -82,7 +80,6 @@ export default async function Hourly({ searchParams }: { searchParams?: { q?: st
           </p>
         </div>
 
-        {/* Forecast Container */}
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-8">
           {error ? (
             <p className="text-red-500 text-center text-lg">{error}</p>
