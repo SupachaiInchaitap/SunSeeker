@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar";
 import AirQualityGraph from "../components/AirQualityGraph";
 import { getAirQualityData } from "../components/GetAirQuality";
-import { NextPageContext } from 'next';
 
 export default async function AirQualityPage({
   searchParams,
@@ -77,12 +76,3 @@ export default async function AirQualityPage({
   );
 }
 
-export function getServerSideProps(context: NextPageContext) {
-  const { searchParams } = context.query;
-  // You can return searchParams directly here for page rendering if needed
-  return {
-    props: {
-      searchParams: searchParams ? { q: Array.isArray(searchParams) ? searchParams[0] : searchParams } : undefined,
-    },
-  };
-}
