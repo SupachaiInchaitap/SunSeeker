@@ -7,7 +7,7 @@ export default async function AirQualityPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  // Ensure searchParams.q is a string or fallback to "Bangkok"
+  // Handle the searchParams directly inside the page
   const city = typeof searchParams?.q === "string" ? searchParams.q : "Bangkok";
 
   // Function to get the coordinates of the city
@@ -76,4 +76,3 @@ export default async function AirQualityPage({
     </div>
   );
 }
-
