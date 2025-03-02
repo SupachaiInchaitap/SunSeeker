@@ -2,6 +2,7 @@
 import Navbar from "./components/Navbar";
 import CurrentWeather from "./components/CurrentWeather";
 import FavoriteButton from "./components/favoriteButton";
+import { getUser } from "@/utils/supabase/getUser";
 
 interface WeatherData {
   coord: {
