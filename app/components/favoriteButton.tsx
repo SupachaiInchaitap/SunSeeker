@@ -79,8 +79,10 @@ export default function FavoriteButton({ city, lat, lon, user }: FavoriteButtonP
   return (
     <button
       onClick={handleFavorite}
-      className={`mt-4 px-4 py-2 rounded-lg shadow-md transition-colors duration-300 ${
-        isFavorite ? "bg-red-500 text-white" : "bg-gray-300 text-gray-800"
+      className={`mt-4 px-6 py-3 rounded-full shadow-lg font-semibold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 ${
+        isFavorite
+          ? "bg-red-500 text-white hover:bg-red-600" // Remove from favorites (red background, white text)
+          : "bg-white text-gray-800 hover:bg-gray-100" // Add to favorites (white background)
       } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
       disabled={loading}
     >
