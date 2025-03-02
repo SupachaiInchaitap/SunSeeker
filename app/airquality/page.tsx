@@ -2,14 +2,13 @@ import Navbar from "../components/Navbar";
 import AirQualityGraph from "../components/AirQualityGraph";
 import { getAirQualityData } from "../components/GetAirQuality";
 
-export default async function AirQualityPage({
-  searchParams,
-}: {
+type AirQualityPageProps = {
   searchParams: { [key: string]: string | string[] | undefined };
-}) {
+};
+
+export default async function AirQualityPage({ searchParams }: AirQualityPageProps) {
   const city = typeof searchParams?.q === "string" ? searchParams.q : "Bangkok";
 
-  // Function to get the coordinates of the city
   async function getCoordinates(city: string) {
     const API_KEY = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
     if (!API_KEY) {
@@ -33,7 +32,6 @@ export default async function AirQualityPage({
 
   const coords = await getCoordinates(city);
 
-  // If city is not found, show an error message
   if (!coords) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
@@ -48,7 +46,6 @@ export default async function AirQualityPage({
     );
   }
 
-  // Fetch Air Quality Data
   const airQualityData = await getAirQualityData(coords.lat, coords.lon);
   const graphData = Array.isArray(airQualityData) ? airQualityData : [];
 
@@ -75,4 +72,3 @@ export default async function AirQualityPage({
     </div>
   );
 }
-
