@@ -39,7 +39,7 @@ export default async function Navbar({ searchParams, targetPage = "/" }: NavbarP
   } = await supabase.auth.getUser();
 
   // Ensure searchParams is awaited before accessing
-  const city = searchParams?.q || "Bangkok"; // Ensure default city if q is undefined
+  const city = searchParams?.q || "Bangkok"; // Default to "Bangkok" if q is undefined
   const weather = await fetchWeather(city);
 
   // Get the first letter of the user's email or name to use as the avatar

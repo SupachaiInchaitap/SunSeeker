@@ -27,7 +27,8 @@ async function fetchWeather(city: string): Promise<WeatherData | null> {
   return data;
 }
 
-export default async function Home({ searchParams }: { searchParams: { q?: string } }) {
+export default async function Home(props: { searchParams: Promise<{ q?: string }> }) {
+  const searchParams = await props.searchParams;
   const params = await searchParams;
   const city = params.q || "Bangkok";
 

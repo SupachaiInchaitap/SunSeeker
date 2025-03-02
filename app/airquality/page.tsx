@@ -1,3 +1,5 @@
+// app/airquality/page.tsx
+
 import Navbar from "../components/Navbar";
 import AirQualityGraph from "../components/AirQualityGraph";
 import { getAirQualityData } from "../components/GetAirQuality";
@@ -51,8 +53,9 @@ export default async function AirQualityPage({ searchParams }: AirQualityPagePro
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-      <Navbar targetPage="/airquality" searchParams={{ q: city }} />
+      <Navbar targetPage="/airquality" searchParams={searchParams} />
 
+      {/* Main Content */}
       <div className="flex flex-col items-center px-6 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800">Air Quality Index</h1>
@@ -61,6 +64,7 @@ export default async function AirQualityPage({ searchParams }: AirQualityPagePro
           </p>
         </div>
 
+        {/* Graph Container */}
         <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-8">
           {graphData.length > 0 ? (
             <AirQualityGraph graphData={graphData} />
@@ -72,3 +76,4 @@ export default async function AirQualityPage({ searchParams }: AirQualityPagePro
     </div>
   );
 }
+

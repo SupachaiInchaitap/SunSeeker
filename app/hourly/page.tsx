@@ -62,7 +62,8 @@ interface WeatherData {
   weather: { description: string; icon: string }[];
 }
 
-export default async function Hourly({ searchParams }: { searchParams?: { q?: string } }) {
+export default async function Hourly(props: { searchParams?: Promise<{ q?: string }> }) {
+  const searchParams = await props.searchParams;
   // Ensure searchParams is awaited before accessing
   const city = searchParams?.q || "Bangkok";  // Default value if searchParams.q is undefined
 
