@@ -104,7 +104,7 @@ export default async function ProfilePage() {
   const flattenedGraphData = graphData.flat();
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-50 to-blue-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 to-blue-400">
       <Navbar />
       <div className="flex flex-grow flex-col md:flex-row gap-6 px-6 py-10">
         <div className="w-full md:w-1/3 bg-white rounded-3xl shadow-lg p-6 border-t-4 border-blue-400">

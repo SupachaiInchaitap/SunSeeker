@@ -1,31 +1,38 @@
-// app/lib/getAirQuality.ts
 export async function getAirQualityData(lat: number, lon: number) {
   const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
-
+  
   try {
-    const airQualityResponse = await fetch(
-      `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`
+    console.log("Fetching 24-Hour Historical Air Quality Data...");
+
+    const now = Math.floor(Date.now() / 1000); // Current timestamp
+    const oneDayAgo = now - 86400; // 24 hours ago
+
+    const response = await fetch(
+      `https://api.openweathermap.org/data/2.5/air_pollution/history?lat=${lat}&lon=${lon}&start=${oneDayAgo}&end=${now}&appid=${apiKey}`
     );
 
-    if (!airQualityResponse.ok) {
-      throw new Error("Failed to fetch air quality data");
+    if (!response.ok) {
+      console.error("Response Status:", response.status);
+      const errorText = await response.text();
+      console.error("Error Response Text:", errorText);
+      throw new Error("Failed to fetch historical air quality data");
     }
 
-    const airQualityData = await airQualityResponse.json();
+    const airQualityData = await response.json();
+    console.log("Air Quality History Data:", JSON.stringify(airQualityData, null, 2));
 
-    // Format Data for Graph
+    // Extract hourly AQI data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const graphData = airQualityData.list.map((item: any) => ({
-      time: new Date(item.dt * 1000).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      aqi: item.main.aqi, // Air Quality Index (1-5 scale)
+    const hourlyAQI = airQualityData.list.map((entry: any) => ({
+      time: new Date(entry.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      aqi: entry.main.aqi, // AQI value (1-5 scale)
+      pm2_5: entry.components.pm2_5, // Fine particulate matter
+      pm10: entry.components.pm10, // Coarse particulate matter
     }));
 
-    return graphData;
+    return hourlyAQI.reverse(); // Reverse to show oldest data first
   } catch (error) {
     console.error("Error fetching air quality data:", error);
-    throw new Error("Failed to fetch air quality data");
+    return null; // Return null if API fails
   }
 }

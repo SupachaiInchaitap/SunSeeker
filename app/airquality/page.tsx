@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar";
 import AirQualityGraph from "../components/AirQualityGraph";
 import { getAirQualityData } from "../components/GetAirQuality";
-import { getWeatherData } from "@/utils/Others/getWeather"; // Import the function
 
 interface SearchParams {
   q?: string;
@@ -40,36 +39,40 @@ export default async function AirQualityPage({
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
         <Navbar targetPage="/air-quality" searchParams={searchParams} />
-        <div className="flex flex-col items-center p-6 space-y-8">
-          <h1 className="text-3xl font-medium text-gray-800 mb-4">Air Quality Index</h1>
-          <p className="text-red-500">City not found. Please try again.</p>
+        <div className="flex flex-col items-center justify-center min-h-screen px-6">
+          <div className="bg-white shadow-md rounded-lg p-6 text-center max-w-lg">
+            <h1 className="text-3xl font-semibold text-gray-800">Air Quality Index</h1>
+            <p className="text-red-500 mt-4">City not found. Please try again.</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Fetch Current Air Quality Data
+  // Fetch Air Quality Data
   const airQualityData = await getAirQualityData(coords.lat, coords.lon);
-
-  // Fetch Historical Weather Data
-  const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
-  const historicalData = await getWeatherData(coords.lat, coords.lon, "historical", timestamp);
-
-  const graphData = historicalData ?? airQualityData; // Use historical if available, otherwise current AQI
+  const graphData = Array.isArray(airQualityData) ? airQualityData : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-      <Navbar targetPage="/air-quality" searchParams={searchParams} />
-      <div className="flex flex-col items-center p-6 space-y-8">
-        <h1 className="text-3xl font-medium text-gray-800 mb-4">Air Quality Index for {city}</h1>
+      {/* Navbar stays outside the main container */}
+      <Navbar targetPage="/airquality" searchParams={searchParams} />
 
-        {graphData && graphData.length > 0 ? (
-          <div className="w-full max-w-4xl">
+      {/* Main Content */}
+      <div className="flex flex-col items-center px-6 py-12">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gray-800">Air Quality Index</h1>
+          <p className="text-lg text-gray-700 mt-2">Current AQI for <span className="font-semibold text-blue-600">{city}</span></p>
+        </div>
+
+        {/* Graph Container */}
+        <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-8">
+          {graphData.length > 0 ? (
             <AirQualityGraph graphData={graphData} />
-          </div>
-        ) : (
-          <p className="text-gray-700 text-lg">No data available for this location</p>
-        )}
+          ) : (
+            <p className="text-gray-600 text-lg text-center">No data available for this location</p>
+          )}
+        </div>
       </div>
     </div>
   );

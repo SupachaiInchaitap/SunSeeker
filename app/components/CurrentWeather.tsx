@@ -9,13 +9,23 @@ interface CurrentWeatherProps {
 }
 
 const getAirQualityMessage = (aqi: number): string => {
-  if (aqi <= 50) return "Good";
-  if (aqi <= 100) return "Moderate";
-  if (aqi <= 150) return "Unhealthy for Sensitive Groups";
-  if (aqi <= 200) return "Unhealthy";
-  if (aqi <= 300) return "Very Unhealthy";
+  if (aqi <= 1) return "Good";
+  if (aqi <=  2) return "Fair";
+  if (aqi <=  3) return "Unhealthy for Sensitive Groups";
+  if (aqi <=  4) return "Unhealthy";
+  if (aqi <=  5) return "Very Unhealthy";
   return "Hazardous";
 };
+
+const getAirQualityColor = (aqi: number): string => {
+  if (aqi <= 1) return "text-green-600"; // Good
+  if (aqi <=  2) return "text-green-600"; // Moderate
+  if (aqi <=  3) return "text-orange-500"; // Unhealthy for Sensitive Groups
+  if (aqi <=  4) return "text-red-500"; // Unhealthy
+  if (aqi <=  5) return "text-purple-600"; // Very Unhealthy
+  return "text-red-900"; // Hazardous
+};
+
 
 // Function to get the icon based on temperature
 const getWeatherIcon = (temp: number): string => {
@@ -53,7 +63,7 @@ export default async function CurrentWeather({ lat, lon }: CurrentWeatherProps) 
           {/* Floating Cloud Decoration */}
           <div className="absolute -top-10 -right-10 opacity-20">
             <Image
-              src="/icons/cloud.png"
+              src="/icons/mild.png"
               alt="Cloud Decoration"
               width={150}
               height={150}
@@ -112,9 +122,10 @@ export default async function CurrentWeather({ lat, lon }: CurrentWeatherProps) 
               <p className="text-xl text-gray-800">
                 <strong>Sunset:</strong> {formatTime(currentWeather.sunset)}
               </p>
-              <p className="text-xl text-gray-800">
+              <p className={`text-xl font-bold ${getAirQualityColor(currentWeather.aqi)}`}>
                 <strong>Air Quality:</strong> {getAirQualityMessage(currentWeather.aqi)}
               </p>
+
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-// app/components/TemperatureGraph.tsx (or TemperatureChart.tsx)
 "use client";
 
 import {
@@ -9,6 +8,7 @@ import {
   Tooltip,
   CartesianGrid,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 
 interface TemperatureGraphProps {
@@ -22,15 +22,18 @@ export default function TemperatureGraph({ graphData }: TemperatureGraphProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <LineChart data={graphData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="cityName" />
-        <YAxis domain={["auto", "auto"]} />
-        <Tooltip />
+        <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.5} />
+        <XAxis dataKey="cityName" tick={{ fontSize: 12 }} />
+        <YAxis domain={["auto", "auto"]} tick={{ fontSize: 12 }} />
+        <Tooltip contentStyle={{ backgroundColor: "rgba(0,0,0,0.7)", color: "#fff" }} />
+        <Legend wrapperStyle={{ fontSize: 14 }} />
         <Line
           type="monotone"
           dataKey="temp"
-          stroke="#8884d8"
-          activeDot={{ r: 8 }}
+          stroke="#ff7300"
+          strokeWidth={2}
+          dot={{ r: 4 }}
+          activeDot={{ r: 6 }}
         />
       </LineChart>
     </ResponsiveContainer>
