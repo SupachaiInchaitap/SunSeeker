@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const { email } = await req.json();
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://localhost:3000/reset-password", // Change this to your actual reset password page
+    redirectTo: "http://localhost:3000/reset-password", // Change this to your actual reset password page
   });
 
   if (error) {

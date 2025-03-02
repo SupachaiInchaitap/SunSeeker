@@ -2,8 +2,8 @@ import Navbar from "../components/Navbar";
 import AirQualityGraph from "../components/AirQualityGraph";
 import { getAirQualityData } from "../components/GetAirQuality";
 
-interface SearchParams {
-  q?: string;
+interface PageProps {
+  searchParams?: Record<string, string | string[] | undefined>;
 }
 
 async function getCoordinates(city: string) {
@@ -27,12 +27,8 @@ async function getCoordinates(city: string) {
   };
 }
 
-export default async function AirQualityPage({
-  searchParams,
-}: {
-  searchParams?: SearchParams;
-}) {
-  const city = searchParams?.q || "Bangkok";
+export default async function AirQualityPage({ searchParams }: PageProps) {
+  const city = typeof searchParams?.q === "string" ? searchParams.q : "Bangkok";
   const coords = await getCoordinates(city);
 
   if (!coords) {
@@ -62,7 +58,9 @@ export default async function AirQualityPage({
       <div className="flex flex-col items-center px-6 py-12">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-800">Air Quality Index</h1>
-          <p className="text-lg text-gray-700 mt-2">Current AQI for <span className="font-semibold text-blue-600">{city}</span></p>
+          <p className="text-lg text-gray-700 mt-2">
+            Current AQI for <span className="font-semibold text-blue-600">{city}</span>
+          </p>
         </div>
 
         {/* Graph Container */}
