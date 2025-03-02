@@ -5,7 +5,7 @@ import { getAirQualityData } from "../components/GetAirQuality";
 export default async function AirQualityPage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
   // Ensure searchParams.q is a string or fallback to "Bangkok"
   const city = typeof searchParams?.q === "string" ? searchParams.q : "Bangkok";
@@ -76,3 +76,4 @@ export default async function AirQualityPage({
     </div>
   );
 }
+
