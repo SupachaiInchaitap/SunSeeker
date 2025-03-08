@@ -17,8 +17,14 @@ export async function middleware(request: NextRequest) {
   // Get the requested path
   const url = request.nextUrl.clone()
 
-  // Do not redirect if the user is trying to access the main page or login/signup
-  if (url.pathname === '/' || url.pathname === '/login' || url.pathname === '/signup' || url.pathname === '/weather' ) {
+  // Do not redirect if the user is trying to access the main page, login/signup, or weather page
+  if (
+    url.pathname === '/' || 
+    url.pathname === '/login' || 
+    url.pathname === '/signup' ||
+    url.pathname === '/hourly' ||
+    url.pathname === '/airquality'
+  ) {
     return NextResponse.next()
   }
 
