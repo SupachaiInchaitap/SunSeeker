@@ -1,6 +1,7 @@
 import Navbar from "../components/Navbar";
 import SearchBar from "../components/Searchbar";
 import AirQualityClient from "../components/AirQualityClient"; // Import the new Client Component
+import { Suspense } from "react"; // Import Suspense
 
 export default function AirQualityPage() {
   return (
@@ -20,10 +21,12 @@ export default function AirQualityPage() {
         {/* Search Bar */}
         <SearchBar targetPage="/airquality" />
 
-        {/* Display the Air Quality Client Component */}
-        <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-8">
-          <AirQualityClient />
-        </div>
+        {/* Wrap the AirQualityClient in Suspense */}
+        <Suspense fallback={<div>Loading...</div>}>
+          <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6 mt-8">
+            <AirQualityClient />
+          </div>
+        </Suspense>
       </div>
     </div>
   );
