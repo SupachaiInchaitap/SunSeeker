@@ -3,17 +3,20 @@ import { getUser } from "@/utils/supabase/getUser"; // Make sure this path is co
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-const supabase = createServerClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-  {
-    cookies: {
-      get: async (name) => (await cookies()).get(name)?.value,
-    },
-  }
-);
+async function getSupabase() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get: async (name) => (await cookies()).get(name)?.value,
+      },
+    }
+  );
+}
 
 export async function GET(request: Request) {
+  const supabase = await getSupabase();
   const user = await getUser();
 
   if (!user) {
@@ -38,6 +41,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const supabase = await getSupabase();
   const user = await getUser();
 
   if (!user) {
@@ -62,6 +66,7 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const supabase = await getSupabase();
   const user = await getUser();
 
   if (!user) {

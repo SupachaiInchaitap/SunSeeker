@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { BsSearch } from "react-icons/bs";
 import { createClient } from "@/utils/supabase/server";
 import { logout } from "../(auth)/function/action";
 
@@ -27,19 +26,14 @@ async function fetchWeather(city: string) {
   }
 }
 
-interface NavbarProps {
-  searchParams: { q?: string }; // Ensure searchParams is always passed
-  targetPage?: string;
-}
-
-export default async function Navbar({ searchParams, targetPage = "/" }: NavbarProps) {
+export default async function Navbar() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Ensure searchParams is awaited before accessing
-  const city = searchParams?.q || "Bangkok"; // Default to "Bangkok" if q is undefined
+  // Default city for weather if not available
+  const city = "Bangkok"; 
   const weather = await fetchWeather(city);
 
   // Get the first letter of the user's email or name to use as the avatar
@@ -63,25 +57,11 @@ export default async function Navbar({ searchParams, targetPage = "/" }: NavbarP
           )}
         </Link>
 
-        {/* Search Bar */}
-        <form method="get" action={targetPage} className="relative">
-          <div className="flex items-center space-x-2 bg-white text-black rounded-full px-4 py-2 shadow-inner w-60 md:w-72 lg:w-96">
-            <BsSearch size={20} className="text-gray-500" />
-            <input
-              type="text"
-              name="q"
-              className="outline-none bg-transparent w-full placeholder-gray-400"
-              placeholder="Search city..."
-              defaultValue={city}  // Use the city directly here
-            />
-          </div>
-        </form>
-
         {/* Authentication Section */}
         <div className="relative z-30">
           {user ? (
             <details className="dropdown dropdown-bottom dropdown-end group">
-              <summary className="py-4 px-6 flex justify-between items-center bg-white text-black border-2  rounded-lg cursor-pointer">
+              <summary className="py-4 px-6 flex justify-between items-center bg-white text-black border-2 rounded-lg cursor-pointer">
                 {/* Profile Avatar with the first letter of the email */}
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white">
@@ -105,7 +85,7 @@ export default async function Navbar({ searchParams, targetPage = "/" }: NavbarP
                   </Link>
                 </li>
                 <li className="hover:bg-gray-100 duration-200 py-3 px-5 text-lg text-black">
-                  <form action={logout} method="POST" className="flex gap-5">
+                  <form action={logout} className="flex gap-5">
                     <i className="fa-solid fa-right-from-bracket text-xl"></i>
                     <button type="submit" className="w-full text-left text-black">
                       Logout

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/profile/page.tsx
-
-import { getUser } from "@/utils/supabase/getUser"; // Ensure this gets the logged-in user's auth info
+import { getUser } from "@/utils/supabase/getUser";
 import Navbar from "../components/Navbar";
 import { createClient } from "@supabase/supabase-js";
-import ProfileTabs from "../components/ProfileTab";
+import { Suspense } from "react";
+import TemperatureGraphWrapper from "../components/TemperatureChartBox";
+import CurrentWeather from "../components/CurrentWeather";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -13,10 +13,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
 async function getUserFavorites(userId: string) {
-  if (!userId) {
-    return [];
-  }
-
+  // Fetching favorites securely with Service Role Key
   const { data: favorites, error } = await supabaseAdmin
     .from("user_favorites")
     .select("city_name, lat, lon")
@@ -68,9 +65,7 @@ export default async function ProfilePage() {
   if (!user) {
     return (
       <div className="w-full h-screen flex flex-col justify-center items-center text-center">
-        <Navbar searchParams={{
-          q: undefined
-        }} />
+        <Navbar />
         <h1 className="text-3xl font-bold text-red-500">
           You are not logged in.
         </h1>
@@ -87,9 +82,7 @@ export default async function ProfilePage() {
   if (!userDetails) {
     return (
       <div className="w-full h-screen flex flex-col justify-center items-center text-center">
-        <Navbar searchParams={{
-          q: undefined
-        }} />
+        <Navbar />
         <h1 className="text-3xl font-bold text-red-500">Error fetching user data.</h1>
         <p className="text-gray-600 mt-2">Please try again later.</p>
       </div>
@@ -109,23 +102,50 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-200 to-blue-400">
-      <Navbar searchParams={{
-        q: undefined
-      }} />
+      <Navbar />
       <div className="flex flex-grow flex-col md:flex-row gap-6 px-6 py-10">
+        {/* Left Sidebar - User Profile */}
         <div className="w-full md:w-1/3 bg-white rounded-3xl shadow-lg p-6 border-t-4 border-blue-400">
           <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Profile</h2>
           <div className="flex flex-col items-center">
+            {/* Profile Picture */}
             <div className="w-28 h-28 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 flex justify-center items-center text-white text-4xl font-bold mb-4 shadow-md">
               {userDetails?.username?.charAt(0).toUpperCase() || "?"}
             </div>
             <p className="text-2xl font-bold text-gray-800">{userDetails?.username || "No username provided"}</p>
             <p className="text-gray-600 mt-2">Welcome back!</p>
+            <p className="text-gray-600 mt-2">{userDetails?.email}</p>
           </div>
         </div>
 
+        {/* Main Content - Favorites and Graph */}
         <div className="w-full md:w-2/3 bg-white rounded-3xl shadow-lg p-6">
-          <ProfileTabs favoriteCities={favoriteCities} graphData={flattenedGraphData} />
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Your Favorite Cities</h2>
+          <div className="space-y-6">
+            {favoriteCities.length > 0 ? (
+              favoriteCities.map((city, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+                >
+                  <h3 className="text-xl font-bold text-gray-800">{city.city_name}</h3>
+                  <Suspense fallback={<p>Loading weather...</p>}>
+                    <CurrentWeather lat={city.lat} lon={city.lon} />
+                  </Suspense>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-600">No favorites added yet.</p>
+            )}
+          </div>
+
+          {/* Graph Section */}
+          <div className="mt-8 bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">Temperature Graph</h3>
+            <Suspense fallback={<p>Loading graph...</p>}>
+              <TemperatureGraphWrapper graphData={flattenedGraphData} />
+            </Suspense>
+          </div>
         </div>
       </div>
     </div>

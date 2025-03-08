@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar";
 import HourlyForecast from "../components/HourlyForecast"; // นำเข้า HourlyForecast
+import SearchBar from "../components/Searchbar";
 
 export interface HourlyWeather {
   dt: number;
@@ -71,11 +72,12 @@ export default async function Hourly(props: { searchParams?: Promise<{ q?: strin
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-      <Navbar searchParams={searchParams || { q: city }} targetPage="/hourly" />
+      <Navbar/>
 
       <div className="flex flex-col items-center px-6 py-12">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-800">Hourly Forecast</h1>
+          <h1 className="text-4xl font-bold text-gray-800 mb-5">Hourly Forecast</h1>
+          <SearchBar targetPage="/hourly" />
           <p className="text-lg text-gray-700 mt-2">
             Weather forecast for <span className="font-semibold text-blue-600">{city}</span>
           </p>

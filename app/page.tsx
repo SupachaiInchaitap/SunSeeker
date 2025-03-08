@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import CurrentWeather from "./components/CurrentWeather";
 import FavoriteButton from "./components/favoriteButton";
 import { getUser } from "@/utils/supabase/getUser";
+import SearchBar from "./components/Searchbar";
 
 interface WeatherData {
   coord: {
@@ -43,8 +44,9 @@ export default async function Home(props: { searchParams: Promise<{ q?: string }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-200 to-blue-400">
-      <Navbar searchParams={searchParams} targetPage="/" />
+      <Navbar />
       <div className="flex flex-col items-center p-6 space-y-8">
+      <SearchBar targetPage="/" />
         {/* Only show weather if lat and lon are available */}
         {lat && lon ? (
           <CurrentWeather lat={lat} lon={lon} />
